@@ -5,9 +5,9 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 
 interface ProductProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 async function getProduct(slug: string): Promise<Product> {
@@ -28,7 +28,7 @@ async function getProduct(slug: string): Promise<Product> {
 export async function generateMetadata({
   params,
 }: ProductProps): Promise<Metadata> {
-  const { slug } = params;
+  const { slug } = await params;
   const product = await getProduct(slug);
 
   return {
@@ -36,8 +36,17 @@ export async function generateMetadata({
   };
 }
 
+// export async function generateStaticParams() {
+//   const response = await api("/products/featured");
+//   const products: Product[] = await response.json();
+
+//   return products.map((product) => ({
+//     slug: product.slug,
+//   }));
+// }
+
 export default async function ProductPage({ params }: ProductProps) {
-  const { slug } = params;
+  const { slug } = await params;
   const product = await getProduct(slug);
 
   return (
@@ -79,7 +88,7 @@ export default async function ProductPage({ params }: ProductProps) {
         </div>
 
         <div className="mt-8 space-y-4">
-          <span className="blcok font-semibold">Tamanhos</span>
+          <span className="block font-semibold">Tamanhos</span>
 
           <div className="flex gap-2">
             <button

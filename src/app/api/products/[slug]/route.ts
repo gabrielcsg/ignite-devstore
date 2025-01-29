@@ -3,12 +3,15 @@ import data from "../data.json";
 
 export async function GET(
   _: Request,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   await new Promise((resolve) => setTimeout(resolve, 1500));
 
-  const slug = z.string().parse(params.slug);
-  const product = data.products.find((product) => product.slug === slug);
+  const { slug } = await params;
+  const validatedSlug = z.string().parse(slug);
+  const product = data.products.find(
+    (product) => product.slug === validatedSlug
+  );
 
   if (!product) {
     return Response.json(
